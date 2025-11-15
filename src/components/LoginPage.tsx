@@ -43,7 +43,12 @@ const LoginPage: React.FC = () => {
       const { data } = await api.post('/auth/verify-otp', { whatsapp, otp });
       login(data.token, data.user); 
       toast.success('تم تسجيل الدخول بنجاح');
-      navigate('/'); // ✅ توجيه المستخدم تلقائيًا للصفحة الرئيسية
+
+      if (data.user.role === "vendor") {
+        navigate('/my-store');
+      } else {
+        navigate('/category/women');
+      } // ✅ توجيه المستخدم تلقائيًا للصفحة الرئيسية
     } catch (err: unknown) { 
       let msg = 'الكود غير صحيح أو انتهت صلاحيته';
       if (err && typeof err === 'object' && 'response' in err) {

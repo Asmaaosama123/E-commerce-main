@@ -40,7 +40,6 @@ function HomePage() {
   const { isFavorite, toggleFavorite, isLoading: favoritesLoading } = useFavorites();
   const navigate = useNavigate();
 
-  // 🧩 تحميل بيانات المنتجات التجريبية
   useEffect(() => {
     setProductsLoading(true);
     setTimeout(() => {
@@ -49,7 +48,7 @@ function HomePage() {
     }, 600);
   }, []);
 
-  // دوال مؤقتة للسلة (مش متصلة بباك إند)
+  // Cart dummy functions
   const cartItems: Product[] = [];
   const addToCart = () => {};
   const removeFromCart = () => {};
@@ -81,27 +80,7 @@ function HomePage() {
 
       <main className="bg-white">
         <HeroSection onShopNowClick={() => navigate('/best-sellers')} />
-
-       
       </main>
-{/* 
-      <BottomNav
-        cartItemCount={getCartItemCount()}
-        onCartClick={() => setIsCartOpen(true)}
-        onProfileClick={() => navigate('/profile')}
-        onHomeClick={() => navigate('/')}
-        onMenuClick={() => navigate('/stores')}
-      /> */}
-
-      {/* <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        onCheckout={() => navigate('/checkout')}
-        cartItems={cartItems}
-        onUpdateQuantity={updateQuantity}
-        onRemoveItem={removeFromCart}
-        total={getCartTotal()}
-      /> */}
     </div>
   );
 }
@@ -118,37 +97,38 @@ function App() {
 
   if (!user) return <LoginPage />;
 
+  // Redirect based on role
+  if (user.role === "vendor") return <Navigate to="/my-store" replace />;
+  if (user.role === "customer") return <Navigate to="/category/women" replace />;
+
   return (
     <CartProvider>
       <Toaster position="top-right" />
-
       <Routes>
-        {/* الصفحة الرئيسية */}
+        {/* Default redirect */}
         <Route path="/" element={<Navigate to="/category/women" replace />} />
 
-        {/* الكاتيجوريات */}
+        {/* Categories & Products */}
         <Route path="/category/:categoryName" element={<CategoryHierarchyPage />} />
         <Route path="/category/:categoryName/:subcategoryName" element={<SubcategoryHierarchyPage />} />
         <Route path="/offers/:categoryName" element={<OffersPage />} />
-        <Route path="/OffersPage" element={<OffersPage />} />
-
-        {/* الصفحات */}
         <Route path="/best-sellers" element={<BestSellersPage />} />
         <Route path="/stores/:categoryName?" element={<StoresPage />} />
         <Route path="/store/:storeId" element={<StorePage />} />
-        {/* <Route path="/storeDetailPage/:storeName" element={<StoresPage />} /> */}
         <Route path="/product/:productId" element={<ProductDetailPage />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage onBack={() => {}} subtotal={0} onConfirmOrder={() => {}} />} />
-        <Route path="/success" element={<SuccessPage onGoHome={() => {}} />} />
 
-        {/* الصفحات الشخصية */}
-        <Route path="/profile" element={<UserProfile user={user} logout={logout} onOpenMyStore={() => {}} />} />
-        <Route path="/my-store" element={<MyStore onBack={() => {}} onViewSellerPage={() => {}} />} />
+        {/* Cart & Checkout */}
+        <Route path="/cart" element={<CartPage />} />
+        <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/success" element={<SuccessPage />} />
+
+        {/* User Profile */}
+        <Route path="/profile" element={<UserProfile user={user} logout={logout} />} />
+
+        {/* Vendor Pages */}
+        <Route path="/my-store" element={<MyStore />} />
         <Route path="/add-product" element={<AddProduct />} />
-<Route path="/add-offer" element={<AddOffer />} />
-        {/* الصفحة الرئيسية العامة */}
-        <Route path="/*" element={<LoginPage />} />
+        <Route path="/add-offer" element={<AddOffer />} />
       </Routes>
     </CartProvider>
   );
