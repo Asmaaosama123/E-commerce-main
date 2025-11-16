@@ -37,7 +37,7 @@ function HomePage() {
   const [productsLoading, setProductsLoading] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  const { isFavorite, toggleFavorite, isLoading: favoritesLoading } = useFavorites();
+  // const { isFavorite, toggleFavorite, isLoading: favoritesLoading } = useFavorites();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -86,49 +86,53 @@ function HomePage() {
 }
 
 function App() {
-  const { user, loading: authLoading, logout } = useAuth();
+  const { user, loading } = useAuth();
 
-  if (authLoading)
+  if (loading) {
+    // ✅ لودنج screen لحد ما يتحقق من localStorage
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
       </div>
     );
-
-  if (!user) return <LoginPage />;
-
-  // Redirect based on role
-  if (user.role === "vendor") return <Navigate to="/my-store" replace />;
-  if (user.role === "customer") return <Navigate to="/category/women" replace />;
+  }
 
   return (
     <CartProvider>
       <Toaster position="top-right" />
       <Routes>
-        {/* Default redirect */}
-        <Route path="/" element={<Navigate to="/category/women" replace />} />
+        {!user ? (
+          <>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="*" element={<Navigate to="/login" replace />} />
+          </>
+        ) : (
+          <>
+            {/* Redirect تلقائي حسب الدور */}
+            <Route path="/" element={
+              <Navigate
+                to={user.role === "vendor" ? "/my-store" : "/category/woman"}
+                replace
+              />
+            } />
 
-        {/* Categories & Products */}
-        <Route path="/category/:categoryName" element={<CategoryHierarchyPage />} />
-        <Route path="/category/:categoryName/:subcategoryName" element={<SubcategoryHierarchyPage />} />
-        <Route path="/offers/:categoryName" element={<OffersPage />} />
-        <Route path="/best-sellers" element={<BestSellersPage />} />
-        <Route path="/stores/:categoryName?" element={<StoresPage />} />
-        <Route path="/store/:storeId" element={<StorePage />} />
-        <Route path="/product/:productId" element={<ProductDetailPage />} />
-
-        {/* Cart & Checkout */}
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/success" element={<SuccessPage />} />
-
-        {/* User Profile */}
-        <Route path="/profile" element={<UserProfile user={user} logout={logout} />} />
-
-        {/* Vendor Pages */}
-        <Route path="/my-store" element={<MyStore />} />
-        <Route path="/add-product" element={<AddProduct />} />
-        <Route path="/add-offer" element={<AddOffer />} />
+            {/* كل الرودز الحالية */}
+            <Route path="/category/:categoryName" element={<CategoryHierarchyPage />} />
+            <Route path="/category/:categoryName/:subcategoryName" element={<SubcategoryHierarchyPage />} />
+            <Route path="/offers/:categoryName" element={<OffersPage />} />
+            <Route path="/best-sellers" element={<BestSellersPage />} />
+            <Route path="/stores/:categoryName?" element={<StoresPage />} />
+            <Route path="/store/:storeId" element={<StorePage />} />
+            <Route path="/product/:productId" element={<ProductDetailPage />} />
+            <Route path="/cart" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/success" element={<SuccessPage />} />
+            <Route path="/profile" element={<UserProfile user={user} logout={() => {}} />} />
+            <Route path="/my-store" element={<MyStore />} />
+            <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/add-offer" element={<AddOffer />} />
+          </>
+        )}
       </Routes>
     </CartProvider>
   );
