@@ -69,18 +69,24 @@ const AddOffer: React.FC = () => {
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const payload = {
-      offerName,
+  
+    const newOffer = {
+      id: Date.now(), // رقم مؤقت
+      name: offerName,
       price: price === "" ? null : price,
       comparePrice: comparePrice === "" ? null : comparePrice,
       description,
       sizes,
       colors,
       imagesCount: imageFiles.length,
+      category: "offers", // مهم عشان يظهر في تاب العروض
+      isOffer: true,
     };
-    console.log("Offer payload:", payload);
-    alert("Offer logged to console (simulated submit).");
+  
+    // navigate للـ MyStore وتمرير العرض الجديد
+    navigate("/my-store", { state: { newProduct: newOffer, selectedTab: "offers" } });
   };
+  
 
   return (
     <div className="min-h-screen bg-white px-6 pt-10 pb-24 max-w-md mx-auto">

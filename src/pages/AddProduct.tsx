@@ -102,20 +102,23 @@ const AddProduct: React.FC = () => {
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-    const payload = {
-      productName,
-      price: price === "" ? null : price,
-      description,
+  
+    const newProduct = {
+      id: Date.now(), // id مؤقت
+      name: productName,
+      price,
       category,
       subcategory,
       subSubcategory,
       sizes,
-      colors: colors.map((c) => ({ name: c.name })),
+      colors,
       imagesCount: imageFiles.length,
     };
-    console.log("Product payload:", payload);
-    alert("Product logged to console (simulated submit).");
+  
+    // نروح لصفحة MyStore مع تمرير المنتج والكاتيجوري المختارة
+    navigate("/my-store", { state: { newProduct, selectedTab: "offers" } });
   };
+  
 
   return (
     <div className="min-h-screen bg-white px-6 pt-10 pb-24 max-w-md mx-auto">

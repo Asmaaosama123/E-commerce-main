@@ -120,6 +120,7 @@ function App() {
             <Route path="/category/:categoryName" element={<CategoryHierarchyPage />} />
             <Route path="/category/:categoryName/:subcategoryName" element={<SubcategoryHierarchyPage />} />
             <Route path="/offers/:categoryName" element={<OffersPage />} />
+            <Route path="/OffersPage" element={<OffersPage />} />
             <Route path="/best-sellers" element={<BestSellersPage />} />
             <Route path="/stores/:categoryName?" element={<StoresPage />} />
             <Route path="/store/:storeId" element={<StorePage />} />

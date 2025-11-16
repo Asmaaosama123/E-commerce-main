@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { ChevronLeft, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useLocation } from "react-router-dom";
 
 const MyStore: React.FC = () => {
   const [products, setProducts] = useState<any[]>([]);
@@ -9,6 +10,10 @@ const MyStore: React.FC = () => {
   const [stats, setStats] = useState({ products: 0, sales: 0, profits: 0 });
   const navigate = useNavigate();
 
+  const location = useLocation();
+  const newProduct = location.state?.newProduct;
+  const initialTab = location.state?.selectedTab || "offers";
+  
   useEffect(() => {
     fetchProducts();
   }, [selectedTab]);
