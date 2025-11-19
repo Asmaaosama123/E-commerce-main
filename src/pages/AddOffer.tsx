@@ -15,7 +15,7 @@ const AddOffer: React.FC = () => {
   const [comparePrice, setComparePrice] = useState<number | "">("");
   const [description, setDescription] = useState("");
 
-  // colors (no images)
+  // colors
   const [colorName, setColorName] = useState("");
   const [colors, setColors] = useState<string[]>([]);
 
@@ -23,6 +23,7 @@ const AddOffer: React.FC = () => {
   const [sizeInput, setSizeInput] = useState("");
   const [sizes, setSizes] = useState<string[]>([]);
 
+  // create image previews
   useEffect(() => {
     const urls = imageFiles.map((f) => URL.createObjectURL(f));
     setImagePreviews((prev) => {
@@ -43,7 +44,6 @@ const AddOffer: React.FC = () => {
     setImageFiles((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // colors
   const handleAddColor = () => {
     const name = colorName.trim();
     if (!name) return alert("Enter color name");
@@ -52,41 +52,45 @@ const AddOffer: React.FC = () => {
   };
 
   const removeColorAt = (index: number) => {
-    setColors((s) => s.filter((_, i) => i !== index));
+    setColors((prev) => prev.filter((_, i) => i !== index));
   };
 
-  // sizes
   const addSize = () => {
     const v = sizeInput.trim();
     if (!v) return;
-    if (!sizes.includes(v)) setSizes((s) => [...s, v]);
+    if (!sizes.includes(v)) setSizes((prev) => [...prev, v]);
     setSizeInput("");
   };
 
   const removeSizeAt = (index: number) => {
-    setSizes((s) => s.filter((_, i) => i !== index));
+    setSizes((prev) => prev.filter((_, i) => i !== index));
   };
 
   const handleSubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
-  
+
+    if (!offerName || !price) return alert("Please fill in required fields");
+    if (!imageFiles.length) return alert("Please upload at least one image");
+
+    // first image as main
+    const mainImage = URL.createObjectURL(imageFiles[0]);
+
     const newOffer = {
-      id: Date.now(), // رقم مؤقت
+      _id: Date.now().toString() + Math.random(),
       name: offerName,
       price: price === "" ? null : price,
       comparePrice: comparePrice === "" ? null : comparePrice,
       description,
       sizes,
       colors,
-      imagesCount: imageFiles.length,
-      category: "offers", // مهم عشان يظهر في تاب العروض
+      images: imageFiles.map((f) => URL.createObjectURL(f)),
+      image: mainImage,
+      category: "offers",
       isOffer: true,
     };
-  
-    // navigate للـ MyStore وتمرير العرض الجديد
+
     navigate("/my-store", { state: { newProduct: newOffer, selectedTab: "offers" } });
   };
-  
 
   return (
     <div className="min-h-screen bg-white px-6 pt-10 pb-24 max-w-md mx-auto">
@@ -100,7 +104,7 @@ const AddOffer: React.FC = () => {
       </div>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-        {/* images */}
+        {/* Images */}
         <div>
           <h2 className="text-sm font-semibold text-gray-700 mb-2">IMAGES</h2>
           <label className="relative border-2 border-dashed border-gray-300 rounded-xl flex flex-col items-center justify-center h-40 overflow-hidden cursor-pointer">
@@ -113,9 +117,7 @@ const AddOffer: React.FC = () => {
               <p className="text-gray-500 text-sm text-center">
                 UPLOAD OFFER IMAGES
                 <br />
-                <span className="text-xs">
-                  PNG, JPG UP TO 5MB — يمكنك رفع صور متعددة
-                </span>
+                <span className="text-xs">PNG, JPG UP TO 5MB — Multiple allowed</span>
               </p>
             </div>
             <input
@@ -149,7 +151,7 @@ const AddOffer: React.FC = () => {
           )}
         </div>
 
-        {/* details */}
+        {/* Details */}
         <div>
           <h2 className="text-sm font-semibold text-gray-700 mb-2">DETAILS</h2>
           <input
@@ -159,32 +161,31 @@ const AddOffer: React.FC = () => {
             placeholder="OFFER NAME"
             required
           />
-        <div className="flex gap-3 mb-3 items-stretch">
-  <input
-    value={price}
-    onChange={(e) =>
-      setPrice(e.target.value === "" ? "" : Number(e.target.value))
-    }
-    type="number"
-    min={0}
-    className="flex-1 border border-gray-300 px-4 py-3 text-sm h-12 w-6"
-    placeholder="PRICE (MRU)"
-    required
-  />
-  <input
-    value={comparePrice}
-    onChange={(e) =>
-      setComparePrice(
-        e.target.value === "" ? "" : Number(e.target.value)
-      )
-    }
-    type="number"
-    min={0}
-    className="flex-1 border border-gray-300 px-4 py-3 text-sm h-12 w-6"
-    placeholder="COMPARE (MRU)"
-  />
-</div>
-
+          <div className="flex gap-3 mb-3 items-stretch">
+            <input
+              value={price}
+              onChange={(e) =>
+                setPrice(e.target.value === "" ? "" : Number(e.target.value))
+              }
+              type="number"
+              min={0}
+              className="flex-1 border border-gray-300 px-4 py-3 text-sm h-12 w-6"
+              placeholder="PRICE"
+              required
+            />
+            <input
+              value={comparePrice}
+              onChange={(e) =>
+                setComparePrice(
+                  e.target.value === "" ? "" : Number(e.target.value)
+                )
+              }
+              type="number"
+              min={0}
+              className="flex-1 border border-gray-300 px-4 py-3 text-sm h-12 w-6"
+              placeholder="COMPARE"
+            />
+          </div>
           <textarea
             value={description}
             onChange={(e) => setDescription(e.target.value)}
@@ -193,14 +194,14 @@ const AddOffer: React.FC = () => {
           />
         </div>
 
-        {/* Colors (no images) */}
+        {/* Colors */}
         <div>
           <h2 className="text-sm font-semibold text-gray-700 mb-2">COLORS</h2>
           <div className="flex gap-2 items-center mb-2">
             <input
               value={colorName}
               onChange={(e) => setColorName(e.target.value)}
-              placeholder="Color name (e.g. Red)"
+              placeholder="Color name"
               className="flex-1 border border-gray-300  px-3 py-2 text-sm"
             />
             <button
@@ -214,10 +215,7 @@ const AddOffer: React.FC = () => {
 
           <div className="flex gap-2 flex-wrap">
             {colors.map((c, i) => (
-              <div
-                key={i}
-                className="flex items-center gap-2 bg-gray-100 px-3 py-1"
-              >
+              <div key={i} className="flex items-center gap-2 bg-gray-100 px-3 py-1">
                 <div className="text-sm font-medium">{c}</div>
                 <button type="button" onClick={() => removeColorAt(i)}>
                   <Trash2 className="w-4 h-4 text-gray-700" />
@@ -229,7 +227,7 @@ const AddOffer: React.FC = () => {
 
         {/* Sizes */}
         <div>
-          <h2 className="text-sm font-semibold text-gray-700 mb-2">SIZE</h2>
+          <h2 className="text-sm font-semibold text-gray-700 mb-2">SIZES</h2>
           <div className="flex items-center gap-2 mb-2">
             <input
               value={sizeInput}
@@ -261,7 +259,7 @@ const AddOffer: React.FC = () => {
           </div>
         </div>
 
-        {/* submit */}
+        {/* Submit */}
         <div className="pt-2 pb-6">
           <button
             type="submit"

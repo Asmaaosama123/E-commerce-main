@@ -10,6 +10,7 @@ import HeroSection from './components/HeroSection';
 import { ProductSection } from './components/ProductSection';
 import Cart from './components/Cart';
 import BottomNav from './components/BottomNav';
+import EditProduct from './pages/EditProduct';
 
 import LoginPage from './components/LoginPage';
 import UserProfile from './components/UserProfile';
@@ -131,6 +132,7 @@ function App() {
             <Route path="/profile" element={<UserProfile user={user} logout={() => {}} />} />
             <Route path="/my-store" element={<MyStore />} />
             <Route path="/add-product" element={<AddProduct />} />
+            <Route path="/edit-product/:id" element={<EditProduct />} />
             <Route path="/add-offer" element={<AddOffer />} />
           </>
         )}
